@@ -6,15 +6,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 import datetime
 import numpy as np
+from textblob import TextBlob
 import requests
-
-# Try to import textblob and handle errors
-try:
-    from textblob import TextBlob
-
-    TEXTBLOB_AVAILABLE = True
-except ImportError:
-    TEXTBLOB_AVAILABLE = False
 
 # Set up Streamlit app
 st.set_page_config(page_title="Sector Rotation Dashboard", layout="wide")
@@ -26,8 +19,9 @@ st.markdown("### A user-friendly dashboard to analyze sector performance, risk, 
 @st.cache_data
 def fetch_stock_list():
     try:
-        stock_list = ["AAPL", "GOOG", "MSFT", "AMZN", "TSLA", "META"]  # Sample stock list
-        return pd.DataFrame({"Ticker": stock_list})
+        # Fetch list of stocks dynamically from Wikipedia S&P 500 page
+        stock_symbols = pd.read_html("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies")[0]['Symbol'].tolist()
+        return pd.DataFrame({"Ticker": stock_symbols})
     except Exception as e:
         st.error(f"Error fetching stock data: {e}")
         return pd.DataFrame()
@@ -65,9 +59,6 @@ if stock_data.empty:
 # Sentiment Analysis
 @st.cache_data
 def get_news_sentiment(ticker):
-    if not TEXTBLOB_AVAILABLE:
-        return 0  # Neutral score if TextBlob is missing
-
     url = f"https://newsapi.org/v2/everything?q={ticker}&apiKey=YOUR_NEWS_API_KEY"
     response = requests.get(url).json()
     if "articles" in response:
@@ -80,8 +71,6 @@ def get_news_sentiment(ticker):
 
 news_sentiment = get_news_sentiment(selected_stock)
 st.subheader("📰 News Sentiment Score")
-if not TEXTBLOB_AVAILABLE:
-    st.warning("⚠️ TextBlob not found. Install it using `pip install textblob` for sentiment analysis.")
 st.write(f"Sentiment Score: {news_sentiment:.2f}")
 
 # Display stock chart
