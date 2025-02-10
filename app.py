@@ -10,8 +10,8 @@ from textblob import TextBlob
 import requests
 
 # Set up Streamlit app
-st.set_page_config(page_title="Sector Rotation Dashboard", layout="wide")
-st.title("📈 Sector Rotation Analysis Dashboard")
+st.set_page_config(page_title="Stock Market Data Analysis", layout="wide")
+st.title("📈 Stock Market Data Analysis")
 st.markdown("### A user-friendly dashboard to analyze sector performance, risk, and stock trends in India")
 
 
