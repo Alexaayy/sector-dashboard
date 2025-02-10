@@ -10,8 +10,8 @@ from textblob import TextBlob
 import requests
 
 # Set up Streamlit app
-st.set_page_config(page_title="Stock Market Data Analysis", layout="wide")
-st.title("📈 Stock Market Data Analysis")
+st.set_page_config(page_title="Stock Market Data analysis", layout="wide")
+st.title("📈 Sector Rotation Analysis Dashboard")
 st.markdown("### A user-friendly dashboard to analyze sector performance, risk, and stock trends in India")
 
 
@@ -115,5 +115,5 @@ def stock_recommendation(stock_data, sentiment):
 if not stock_data.empty:
     recommendation = stock_recommendation(stock_data, news_sentiment)
     st.markdown(
-        f"<div style='padding:10px; border-radius:5px; background-color:#f0f0f0; font-size:18px;'>{recommendation}</div>",
+        f"<div style='padding:10px; border-radius:5px; background-color:#2e86c1; color:white; font-size:18px; font-weight:bold;'>{recommendation}</div>",
         unsafe_allow_html=True)
