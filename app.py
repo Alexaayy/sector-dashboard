@@ -6,12 +6,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 import datetime
 import numpy as np
-from textblob import TextBlob
-import requests
 
 # Set up Streamlit app
 st.set_page_config(page_title="Stock Market Data analysis", layout="wide")
-st.title("📈 Sector Rotation Analysis Dashboard")
+st.title("📈 Stock Market Data analysis")
 st.markdown("### A user-friendly dashboard to analyze sector performance, risk, and stock trends in India")
 
 
@@ -55,24 +53,6 @@ if stock_data.empty:
     st.warning("⚠️ No data available for the selected stock.")
     st.stop()
 
-
-# Sentiment Analysis
-@st.cache_data
-def get_news_sentiment(ticker):
-    url = f"https://newsapi.org/v2/everything?q={ticker}&apiKey=YOUR_NEWS_API_KEY"
-    response = requests.get(url).json()
-    if "articles" in response:
-        headlines = [article["title"] for article in response["articles"][:5]]
-        sentiment_scores = [TextBlob(headline).sentiment.polarity for headline in headlines]
-        avg_sentiment = np.mean(sentiment_scores) if sentiment_scores else 0
-        return avg_sentiment
-    return 0
-
-
-news_sentiment = get_news_sentiment(selected_stock)
-st.subheader("📰 News Sentiment Score")
-st.write(f"Sentiment Score: {news_sentiment:.2f}")
-
 # Display stock chart
 if not stock_data.empty:
     st.subheader(f"📊 {selected_stock} Stock Performance")
@@ -89,21 +69,21 @@ if not stock_data.empty:
     rs = avg_gain / avg_loss.fillna(1)
     stock_data['RSI'] = 100 - (100 / (1 + rs))
 
-# AI-Based Stock Recommendations with Sentiment Analysis
+# AI-Based Stock Recommendations
 st.subheader("📊 AI-Based Stock Recommendation")
 
 
-def stock_recommendation(stock_data, sentiment):
+def stock_recommendation(stock_data):
     try:
         if stock_data.empty:
             return "⚠️ No Data Available"
         latest_rsi = stock_data['RSI'].iloc[-1]
         latest_volatility = stock_data['Volatility'].iloc[-1]
 
-        if latest_rsi > 70 and sentiment < 0:
-            return "📉 Strong Sell - Overbought & Negative Sentiment"
-        elif latest_rsi < 30 and sentiment > 0:
-            return "📈 Strong Buy - Oversold & Positive Sentiment"
+        if latest_rsi > 70:
+            return "📉 Strong Sell - Overbought"
+        elif latest_rsi < 30:
+            return "📈 Strong Buy - Oversold"
         elif latest_volatility > 0.02:
             return "⚠️ Hold - High Volatility Detected"
         else:
@@ -113,7 +93,7 @@ def stock_recommendation(stock_data, sentiment):
 
 
 if not stock_data.empty:
-    recommendation = stock_recommendation(stock_data, news_sentiment)
+    recommendation = stock_recommendation(stock_data)
     st.markdown(
         f"<div style='padding:10px; border-radius:5px; background-color:#2e86c1; color:white; font-size:18px; font-weight:bold;'>{recommendation}</div>",
         unsafe_allow_html=True)
